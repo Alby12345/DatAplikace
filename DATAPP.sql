@@ -45,6 +45,10 @@ create table Customer(
     check (REGEXP_LIKE(Phone, '\+420[1-9][0-9]{8}'))  
 );
 
+-- Unique explicit index trough Email
+--create index Customer_Email_INX
+--  on Customer(Email);
+
 -- Table card, which stores all emmited cards to customers
 create table Card(
   IdCard number(10) not null, 
@@ -55,9 +59,14 @@ create table Card(
   --
   constraint Card_PK
     primary key(IdCard),
+  constraint Card_U_Number
+    unique (NumberC),
   constraint Card_CHK_CanceledB
     check ( CanceledB >=0 AND CanceledB <=1 )
 );
+-- Unique explicit index trough Email
+--create index Card_NumberC_INX
+--  on Card(NumberC);
 
 -- Table account, which stores all accounts
 -- which are availible to theirs custommers
@@ -78,6 +87,10 @@ create table Account(
     check ( Currency in ('CZK', 'EUR', 'USD'))
 );
 
+-- Unique explicit index trough Email
+--create index Account_AccNumber_INX
+--  on Account(AccNumber);
+
 -- Transition Table for 1:N relation ship between Account and its Cards
 create table AccsCards(
   IdAcc number(7) not null,
@@ -96,6 +109,13 @@ create table AccsCards(
     references Card(IdCard)
     on delete cascade
 );
+
+-- Index on AccsCard foreign key
+create index AccsCards_IdAcc_INX
+  on AccsCards(IdAcc);
+--create index AccsCards_IdCard_INX
+--  on AccsCards(IdCard);
+
 -- Transition table for 1:N relation ship between User ant its Accounts
 create table UsrsAccs(
   IdCustomer number(7) not null,
@@ -114,6 +134,12 @@ create table UsrsAccs(
     references Account(IdAcc)
     on delete cascade
 );
+
+-- Index on UsrsAccs foreign key
+create index UsrsAccs_IdCustomer_INX
+  on UsrsAccs(IdCustomer);
+--create index UsrsAccs_IdAccount_INX
+--  on UsrsAccs(IdAccount);
 
 -- Table storing all transactions which were issued
 create table Transaction(
@@ -142,6 +168,13 @@ create table Transaction(
     check ( AccFrom > 0 )
 );
 
+-- Index on Transaction table not unique
+create index Transaction_AccTo_INX
+  on Transaction(AccTo);
+create index Transaction_AccFrom_INX
+  on Transaction(AccFrom);
+
+
 -- Table stroring Aggreements to Customers
 create table Agreement(
   IdAgre number(15) not null,
@@ -156,12 +189,14 @@ create table Agreement(
     foreign key(IdCust)
     references Customer(IdCust),
   constraint Agreement_U_FileId
-    unique(FileId),
-  constraint Agreement_CHK_Created
-    check ( Created <= now )
+    unique(FileId)
 );
-    
-    
+
+-- Index for Agreement table
+create index Agreement_IdCust_INX
+  on Agreement(IdCust);
+--create index Agreement_FileId_INX
+--  on Agreement(FileId);
 
 
 ------------------------------------------------------
