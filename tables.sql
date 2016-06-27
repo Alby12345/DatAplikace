@@ -129,23 +129,21 @@ create table Card(
 --  on AccsCards(IdCard);
 
 --------------------------------------------------------------------------------
--- Transition table for 1:N relation ship between User ant its Accounts
+-- Transition table for M:N relation ship between User ant its Accounts
 -- Id generated with insert trigger
 create table UsrsAccs(
-  IdCustomer number(7) not null,
-  IdAccount number(8) not null,
+  IdCust number(7) not null,
+  IdAcc number(8) not null,
   AccPriv char(4) default('FULL'),
   --
   constraint UsrsAccs_PK 
-    primary key(IdCustomer, IdAccount),
-  constraint UsrsAccs_U_IdAccount
-    unique(IdAccount),
+    primary key(IdCust, IdAcc),
   constraint UsrsAccs_FK_Customer
-    foreign key (IdCustomer)
+    foreign key (IdCust)
     references Customer(IdCust)
     on delete cascade,
   constraint UsrsAccs_FK_Account
-    foreign key (IdAccount)
+    foreign key (IdAcc)
     references Account(IdAcc)
     on delete cascade,
   constraint UsrsAccs_CHK_AccPriv
@@ -154,7 +152,7 @@ create table UsrsAccs(
 
 -- Index on UsrsAccs foreign key
 create index UsrsAccs_IdCustomer_INX
-  on UsrsAccs(IdCustomer);
+  on UsrsAccs(IdAcc);
 --create index UsrsAccs_IdAccount_INX
 --  on UsrsAccs(IdAccount);
 
@@ -261,19 +259,42 @@ create sequence SEQ_Agreement_Id
               -- Deletion of tables and all surounding structures --
 --------------------------------------------------------------------------------
 
+--select 'drop sequence ' || sequence_name || ';' from user_sequences;
 drop sequence SEQ_Customer_Id;
 drop sequence SEQ_Card_Id;
 drop sequence SEQ_Account_Id;
 drop sequence SEQ_Transaction_Id;
 drop sequence SEQ_Agreement_Id;
 
-analyze table Agreement delete statistics; 
-analyze table Transaction delete statistics;
-analyze table UsrsAccs delete statistics;
---analyze table AccsCards delete statistics;
-analyze table Account delete statistics;
-analyze table Card delete statistics;
-analyze table Customer delete statistics;
+
+--select 'drop trigger ' || trigger_name || ';' from user_triggers;
+drop trigger BEF_INS_TRANSACTION;
+drop trigger BEF_DEL_CUSTOMER;
+drop trigger BEF_INS_TRANS;
+drop trigger BEF_INS_AGRE_ID;
+drop trigger BEF_INS_ACC_ID;
+drop trigger BEF_INS_CARD_ID;
+drop trigger BEF_INS_CUST_ID;
+drop trigger BEF_INS_CARD_CVV;
+drop trigger BEF_INS_ACCOUNT_DATECREATED;
+drop trigger BEF_DEL_ACC;
+drop trigger BEF_INS_CARD_EXPIRATION;
+drop trigger BEF_INS_TRANS_ID;
+drop trigger BEF_INS_CARD_NUMBERC;
+drop trigger BEF_INS_ACCOUNT_ACCNUMBER;
+
+--select 'drop view ' || view_name || ';' from user_views;
+drop view VIEW_CUSTACCS;
+drop view VIEW_CUSTACCSFULL;
+drop view VIEW_CUSTWITHMOREACCS;
+
+--select 'analyze table ' || table_name || ' delete statistics' || ';' from user_tables;
+analyze table CUSTOMER delete statistics;
+analyze table ACCOUNT delete statistics;
+analyze table TRANSACTION delete statistics;
+analyze table AGREEMENT delete statistics;
+analyze table USRSACCS delete statistics;
+analyze table CARD delete statistics;
 
 drop table Agreement;
 drop table Transaction;

@@ -145,7 +145,7 @@ create or replace trigger bef_ins_Card_CVV
   end;
 /
 
--- Trigger used for generating expiration date if not inserted
+-- Trigger used for generating expiration date two years from now
 create or replace trigger bef_ins_Card_Expiration
   before insert
   on Card
@@ -160,4 +160,61 @@ create or replace trigger bef_ins_Card_Expiration
   end;
 /
 
+-- Trigger to refuse deletion of account if there is a money on him
+create or replace trigger bef_del_Acc
+  before delete
+  on Account
+  for each row
+  begin
+    if (:OLD.Balance !=0) then
+      RAISE_APPLICATION_ERROR(-20001, 'Account that has non zero balance can not be removed.');
+    end if;
+  end;
+/
 
+create or replace trigger bef_del_Customer
+  before delete
+  on Customer
+  for each row
+  declare
+    accountPositiveCount number;
+  begin
+  -- check if customer does not onwn private account with funds on it
+    select count(*) into accountPositiveCount from
+      (select * from VIEW_Accs_With_Single_Customer where idCust = :NEW.IdCust)
+       natural join Account where balance <> 0;
+    if (accountPositiveCount > 0) then
+      RAISE_APPLICATION_ERROR(-20002, 'Customer could not be deleted, one or more owned accounts has positive balance');
+    end if;
+    
+    --if I made it here only single owned acc customer owns, delete them
+    --delete accounts with zero balance
+    delete from Account where idAcc in
+      (select idAcc from VIEW_Accs_With_Single_Customer where idCust = :NEW.IdCust);
+  end;
+/
+
+create or replace trigger bef_ins_Transaction
+  before insert
+  on Transaction
+  for each row
+  declare
+    myRowCount number;
+  begin
+    -- if bank is null, that means it is within our bank,
+    --then check if acc with that number exist
+    if(:NEW.bankFrom is null) then
+      select count(*) into myRowCount from Account where AccNumber = :NEW.AccFrom;
+      if(myRowCount = 0) then
+        RAISE_APPLICATION_ERROR(-20003, 'Account From does not exist');
+      end if;
+    end if;
+    
+    if(:NEW.bankTo is null) then
+      select count(*) into myRowCount from Account where AccNumber = :NEW.AccTo;
+      if(myRowCount = 0) then
+        RAISE_APPLICATION_ERROR(-20003, 'Destination account does not exist');
+      end if;
+    end if;
+  end;
+/  
