@@ -173,3 +173,4 @@ RAISE_APPICATION_ERROR(-20001, 'Account that has non zero balance can not be rem
 
 select IdCust, FirstName, LASTNAME, EMAIL from CUSTOMER;
 
+

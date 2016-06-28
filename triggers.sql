@@ -213,8 +213,51 @@ create or replace trigger bef_ins_Transaction
     if(:NEW.bankTo is null) then
       select count(*) into myRowCount from Account where AccNumber = :NEW.AccTo;
       if(myRowCount = 0) then
-        RAISE_APPLICATION_ERROR(-20003, 'Destination account does not exist');
+        RAISE_APPLICATION_ERROR(-20004, 'Destination account does not exist');
       end if;
     end if;
   end;
-/  
+/
+
+create or replace trigger bef_ins_usrsAccs
+  before insert
+  on UsrsAccs
+  for each row
+  declare
+    myCount number;
+  begin
+    select count(*) into myCount from UsrsAccs
+    where IdAcc = :NEW.IdAcc;
+    if( myCount > 10 ) then
+      RAISE_APPLICATION_ERROR(-20005, 'User cannot have more than 10 accounts');
+    end if;
+  end;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

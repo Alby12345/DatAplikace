@@ -1,9 +1,13 @@
 --------------------------------------------------------------------------------
                                  -- Views --
 --------------------------------------------------------------------------------
--- Joined table with accounts for customers
+-- Joined table with accounts id for customers
 create or replace view VIEW_Cust_Accs as
   select *from Customer natural join UsrsAccs;
+--------------------------------------------------------------------------------
+-- Joined table with customers id for accounts
+create or replace view VIEW_Acc_Custs as
+  select *from Account natural join UsrsAccs;
 --------------------------------------------------------------------------------
 
 -- full data version of CustomersAccs view

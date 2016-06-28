@@ -131,6 +131,7 @@ create table Card(
 --------------------------------------------------------------------------------
 -- Transition table for M:N relation ship between User ant its Accounts
 -- Id generated with insert trigger
+-- max 10 accounts for person
 create table UsrsAccs(
   IdCust number(7) not null,
   IdAcc number(8) not null,
