@@ -1,4 +1,6 @@
---Triggers 
+--------------------------------------------------------------------------------
+                             -- Triggers --
+--------------------------------------------------------------------------------
 
 --Used for generating id for Cust if not inserted
 create or replace trigger bef_ins_Cust_Id
@@ -183,6 +185,7 @@ create or replace trigger bef_del_Acc
   end;
 /
 
+-- deleted because table is mutating situation
 --create or replace trigger bef_del_Customer
 --  before delete
 --  on Customer
@@ -258,30 +261,6 @@ create or replace trigger bef_ins_CustAccs
   end;
 /
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--------------------------------------------------------------------------------
+                             -- End Triggers --
+--------------------------------------------------------------------------------

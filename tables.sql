@@ -20,7 +20,11 @@
 --TODO: INDEXY, Zacit Trigry
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
                   -- Tables and theirs indexes definitions --
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                             -- Customer --
 --------------------------------------------------------------------------------
 -- Table customer, evides all of banks customers
 -- Id generated with insert trigger
@@ -54,6 +58,8 @@ create table Customer(
 
 
 --------------------------------------------------------------------------------
+                             -- Account --
+--------------------------------------------------------------------------------
 -- Table account, which stores all accounts
 -- which are availible to theirs custommers
 -- Id generated with insert trigger
@@ -80,6 +86,8 @@ create table Account(
 --create index Account_AccNumber_INX
 --  on Account(AccNumber);
 
+--------------------------------------------------------------------------------
+                               -- Card --
 --------------------------------------------------------------------------------
 -- Table card, which stores all emmited cards to customers
 -- Id generated with insert trigger
@@ -132,6 +140,8 @@ create table Card(
 --  on AccsCards(IdCard);
 
 --------------------------------------------------------------------------------
+                             -- CustAccs --
+--------------------------------------------------------------------------------
 -- Transition table for M:N relation ship between User ant its Accounts
 -- Id generated with insert trigger
 -- max 10 accounts for person
@@ -160,6 +170,8 @@ create index CustAccs_IdCustomer_INX
 --create index CustAccs_IdAccount_INX
 --  on CustAccs(IdAccount);
 
+--------------------------------------------------------------------------------
+                           -- Transaction --
 --------------------------------------------------------------------------------
 -- Table storing all transactions which were issued
 -- Id generated with insert trigger
@@ -200,6 +212,8 @@ create index Transaction_AccFrom_INX
 
 
 --------------------------------------------------------------------------------
+                           -- Agreement --
+--------------------------------------------------------------------------------
 -- Table stroring Aggreements to Customers
 -- Id generated with insert trigger
 create table Agreement(
@@ -226,8 +240,14 @@ create index Agreement_IdCust_INX
 
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+                        -- End Tables & indexes --
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
                       --SEQUENTIONS for Id Creations--
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 create sequence SEQ_Customer_Id
   minvalue 1
   maxvalue 9999999
@@ -259,11 +279,22 @@ create sequence SEQ_Agreement_Id
 ;
 
 --------------------------------------------------------------------------------
-                                 -- Trigges --
+                            -- Statistics --
 --------------------------------------------------------------------------------
 
+analyze table CUSTOMER compute statistics;
+analyze table ACCOUNT compute statistics;
+analyze table TRANSACTION compute statistics;
+analyze table AGREEMENT compute statistics;
+analyze table CustAccs compute statistics;
+analyze table CARD compute statistics;
+
+
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
               -- Deletion of tables and all surounding structures --
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 --select 'drop sequence ' || sequence_name || ';' from user_sequences;
