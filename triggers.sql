@@ -90,7 +90,7 @@ create or replace trigger bef_ins_Account_AccNumber
     end if;
   end;
 /
-
+-- used to generate now date to account date created
 create or replace trigger bef_ins_Account_DateCreated
   before insert
   on Account
@@ -99,6 +99,17 @@ create or replace trigger bef_ins_Account_DateCreated
     :NEW.Created := SYSDATE;
   end;
 /
+
+-- used to generate now date to transaction created
+create or replace trigger bef_ins_Transaction_Created
+  before insert
+  on Transaction
+  for each row
+  begin
+    :NEW.Created := SYSDATE;
+  end;
+/
+
 
 -- Trigger used for generating random card number if not inserted
 create or replace trigger bef_ins_Card_NumberC
@@ -172,27 +183,40 @@ create or replace trigger bef_del_Acc
   end;
 /
 
-create or replace trigger bef_del_Customer
-  before delete
-  on Customer
-  for each row
-  declare
-    accountPositiveCount number;
-  begin
-  -- check if customer does not onwn private account with funds on it
-    select count(*) into accountPositiveCount from
-      (select * from VIEW_Accs_With_Single_Customer where idCust = :NEW.IdCust)
-       natural join Account where balance <> 0;
-    if (accountPositiveCount > 0) then
-      RAISE_APPLICATION_ERROR(-20002, 'Customer could not be deleted, one or more owned accounts has positive balance');
-    end if;
-    
-    --if I made it here only single owned acc customer owns, delete them
-    --delete accounts with zero balance
-    delete from Account where idAcc in
-      (select idAcc from VIEW_Accs_With_Single_Customer where idCust = :NEW.IdCust);
-  end;
-/
+--create or replace trigger bef_del_Customer
+--  before delete
+--  on Customer
+--  for each row
+--  declare
+--    accountPositiveCount number;
+--  begin
+--  -- check if customer does not onwn private account with funds on it
+--    select count(*) into accountPositiveCount from
+--      (select * from VIEW_Accs_With_Single_Customer where idCust = :OLD.IdCust)
+--       natural join Account where balance <> 0;
+--    if (accountPositiveCount > 0) then
+--      RAISE_APPLICATION_ERROR(-20002, 'Customer could not be deleted, one or more owned accounts has positive balance');
+--    end if;
+--    
+--    --if I made it here only single owned acc customer owns, delete them
+--    --delete accounts with zero balance
+--    delete from Account where idAcc in
+--      (select idAcc from VIEW_Accs_With_Single_Customer where idCust = :NEW.IdCust);
+--  end;
+--/
+--create or replace trigger bef_del_CustAccs
+--  before delete
+--  on CustAccs
+--  for each row
+--  declare
+--    accountPositiveCount number;
+--    diffOwnerOfCountCount number;
+--  begin
+--    select count(*) from CustAccs where 
+--  
+--  end;
+--/
+
 
 create or replace trigger bef_ins_Transaction
   before insert
@@ -219,14 +243,14 @@ create or replace trigger bef_ins_Transaction
   end;
 /
 
-create or replace trigger bef_ins_usrsAccs
+create or replace trigger bef_ins_CustAccs
   before insert
-  on UsrsAccs
+  on CustAccs
   for each row
   declare
     myCount number;
   begin
-    select count(*) into myCount from UsrsAccs
+    select count(*) into myCount from CustAccs
     where IdAcc = :NEW.IdAcc;
     if( myCount > 10 ) then
       RAISE_APPLICATION_ERROR(-20005, 'User cannot have more than 10 accounts');
